@@ -191,19 +191,29 @@ function cloudSave(entries){
   }).then(function(r){return r.json()}).then(function(){return true}).catch(function(){return false});
 }
 
+function showSyncDot(syncing){
+  var dot=document.getElementById('syncDot');
+  if(!dot)return;
+  if(syncing){dot.classList.add('syncing')}
+  else{dot.classList.remove('syncing')}
+}
+
 function syncFromCloud(){
+  showSyncDot(true);
   return cloudLoad().then(function(cloudEntries){
+    showSyncDot(false);
     if(cloudEntries!==null){
       localStorage.setItem(S,JSON.stringify(cloudEntries));
       return true;
     }
     return false;
-  }).catch(function(){return false});
+  }).catch(function(){showSyncDot(false);return false});
 }
 
 function syncToCloud(entries){
   localStorage.setItem(S,JSON.stringify(entries));
-  cloudSave(entries);
+  showSyncDot(true);
+  cloudSave(entries).then(function(){showSyncDot(false)});
 }
 
 function ld(){try{return JSON.parse(localStorage.getItem(S))||[]}catch(e){return[]}}
