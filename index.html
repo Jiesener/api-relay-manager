@@ -232,23 +232,15 @@ async function doLogin(){
     if(userData&&userData.password){
       errEl.textContent='用户名已存在';errEl.style.display='block';return;
     }
-    // 创建账号
+    // 创建账号（空数据，不迁移旧数据）
     await fetch(FB_URL+'/users/'+user+'.json',{
       method:'PUT',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:hashed,createdAt:Date.now()})
+      body:JSON.stringify({password:hashed,createdAt:Date.now(),entries:[]})
     });
-    // 迁移已有数据
-    var oldData=await fetch(FB_URL+'/relay.json').then(function(r){return r.json()}).catch(function(){return null});
-    if(oldData&&oldData.entries&&oldData.entries.length>0){
-      await fetch(FB_URL+'/users/'+user+'/entries.json',{
-        method:'PUT',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(oldData.entries)
-      });
-    }
     localStorage.setItem(USER_KEY,JSON.stringify({user:user,pass:hashed}));
     document.getElementById('loginOverlay').classList.add('hidden');
     initApp();
-    toast('注册成功，已迁移旧数据');
+    toast('注册成功，新账号数据为空');
   }else{
     // 登录
     var userData=await fetch(FB_URL+'/users/'+user+'.json').then(function(r){return r.json()}).catch(function(){return null});
