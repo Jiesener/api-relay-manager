@@ -170,23 +170,22 @@ body.theme-light::before{content:'';position:fixed;inset:0;background:radial-gra
 
 <script>
 var S='relay_v3',TK='relay_theme',FK='relay_filter';
-var API_KEY='$2a$10$hj2L8dQlL6o5l8zMYi9dP.n3ILlEpJU14/irLt8TA9QI9AMiivvi6';
-var BIN_ID='6a428020da38895dfe106dc4';
+var FB_URL='https://comment-app-5a494-default-rtdb.firebaseio.com';
 
-/* cloud sync */
+/* cloud sync using Firebase REST API */
 function cloudLoad(){
-  return fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{
-    headers:{'X-Master-Key':API_KEY}
-  }).then(function(r){return r.json()}).then(function(d){
-    if(d.record&&d.record.entries)return d.record.entries;
+  return fetch(FB_URL+'/relay.json')
+  .then(function(r){return r.json()})
+  .then(function(d){
+    if(d&&d.entries)return d.entries;
     return null;
   }).catch(function(){return null});
 }
 
 function cloudSave(entries){
-  return fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{
+  return fetch(FB_URL+'/relay.json',{
     method:'PUT',
-    headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({entries:entries,timestamp:Date.now()})
   }).then(function(r){return r.json()}).then(function(){return true}).catch(function(){return false});
 }
